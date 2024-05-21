@@ -11,7 +11,7 @@ cgitb.enable(display=0, logdir="/logs")
 form = cgi.FieldStorage()
 
 def responseForm(status, content, contentType, contentLength, location=None):
-	print("Status: 200\r")
+	print(f"HTTP/1.1 {status} {status}\r")
 	print(f"Content-Type: {contentType}\r")
 	if location:
 		print(f"Location: {location}\r")
@@ -43,7 +43,7 @@ def handleGet():
 		listing = FileControl(form)
 		listing.display()
 	else:
-		html = HTMLForm("Bad Request")
+		html = HTMLForm("Bad Request METHOD")
 		responseForm(400, html, "text/html", len(html))
 
 
@@ -51,11 +51,11 @@ def handleGet():
 
 def handlePost():
 	contetenType = os.environ.get('CONTENT_TYPE')
-	if contetenType == "multipart/form-data":
+	if contetenType.startswith("multipart/form-data"):
 		listing = FileControl(form)
 		listing.handleUpload()
 	else:
-		html = HTMLForm("Bad Request")
+		html = HTMLForm("Bad Request POST")
 		responseForm(400, html, "text/html", len(html))
 	
 

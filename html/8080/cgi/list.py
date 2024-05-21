@@ -6,7 +6,7 @@ import datetime
 import uuid
 
 
-UPLOAD_DIR = "/Users/parkjunseo/42/webserv/html/8080/uploads"
+UPLOAD_DIR = "/Users/seodong-gyun/42/WebServer/html/8080/at"
 MAX_FILE_SIZE = 1024 * 1024 * 10
 ALLOWED_EXTENSIONS = [".jpg", ".jpeg", ".png", ".gif", ".txt", ".pdf"]
 FILE_SIZE_ERROR = 1
@@ -155,7 +155,7 @@ class FileControl:
 		print("\r")
 		print(Response)
 
-	def save_uploaded_file(fileitem, UPLOAD_DIR):
+	def save_uploaded_file(self, fileitem, UPLOAD_DIR):
 		filename = fileitem.filename
 
 		if not filename:
