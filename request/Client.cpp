@@ -12,6 +12,8 @@ void Client::clearAll() {
 
 Client::~Client() {
 	clearAll();
+	delete _procPtr;
+	_procPtr = NULL;
 }
 
 const ResponseHandle& Client::getResponseHandle() const{
@@ -29,7 +31,6 @@ void Client::setResponse(const std::string &param) {
 void Client::appendResponse(const char *param) {
 	if (param)
 		_response += param;
-	// _response += param;
 }
 
 Port Client::getPort() const {
@@ -54,7 +55,6 @@ bool	Client::getIsKeepAlive() const {
 }
 
 void	Client::makeExecuteCommand(std::string &extention) {
-	std::cout << __LINE__ << " | extention = " << extention << std::endl;
     if (extention == "py") {
         extention = "/usr/bin/python3";
     } else if (extention == "php") {
@@ -101,74 +101,70 @@ void	Client::setEnv(const Config &Conf, const RequestHandle &Req) {
 		setenv("HTTP_PRAGMA", Req.getHeader("Cache-Control").c_str(), 1);
         setenv("HTTP_ACCEPT_ENCODING", Req.getHeader("Accept-Encoding").c_str(), 1);
         setenv("HTTP_KEEP_ALIVE", Req.getHeader("Keep-Alive").c_str(), 1);
+		std::string UploadDir = "at";
+		setenv("UPLOAD_DIR", UploadDir.c_str(), 1);
     }
     if (Req.getMethod() == "GET") {
     	setenv("PATH_INFO", _responseHandle.getPathInfo().c_str(), 1);
 	    setenv("QUERY_STRING", query.c_str(), 1);    
     }
     if (Req.getMethod() == "POST") {
+		
 	    setenv("CONTENT_LENGTH", Req.getHeader("Content-Length").c_str(), 1);
         setenv("CONTENT_TYPE", Req.getHeader("Content-Type").c_str(), 1);
     }
 }
-void Client::makeTempFileNameForCgi(std::string &filePath) {
+void Client::makeTempFileNameForCgi(std::string &filePath, int mode) {
 	std::srand(std::time(NULL));
-
-	filePath = "/tmp/webserv-";
-	filePath += Manager::utils.toString(std::rand());
+	if (mode == STDIN_FILENO)
+		filePath = "/tmp/webserv-STDIN-";
+	else 
+		filePath = "/tmp/webserv-STDOUT-";
+		filePath += Manager::utils.toString(std::rand());
 }
 
 void Client::handleCGI(const Config &Conf) {
-	FD pipeParentToChild[2];
 	int processPid;
+	std::string tempFileNameIn;
+	std::string tempFileNameOut;
 	std::vector<char *> commands;
 	std::string service = Manager::responseUtils.getFileExtension(_responseHandle.getFilePath());
 	std::string pathToExecute = _responseHandle.getFilePath();
-	
-	std::cout << __LINE__ << " | pathToExecute = " << pathToExecute << std::endl;
-	std::cout << __LINE__ << " | service before change= " << service << std::endl;
-
-	int tempFileFd;
-	std::string tempFilePath;
 
 	makeExecuteCommand(service);
-	std::cout << __LINE__ << " | service after change= " << service << std::endl;
-	makeTempFileNameForCgi(tempFilePath);
+	makeTempFileNameForCgi(tempFileNameIn, STDIN_FILENO);
+	makeTempFileNameForCgi(tempFileNameOut, STDOUT_FILENO);
 	commands.push_back(const_cast<char*>(service.c_str()));
 	commands.push_back(const_cast<char*>(pathToExecute.c_str()));
 	commands.push_back(NULL);
-	if (pipe(pipeParentToChild) == -1) {
-		std::cerr << "pipe error" << std::endl;
-		throw InternalServerError_500;
-	}
-	tempFileFd = open(tempFilePath.c_str(), O_RDWR | O_CREAT | O_TRUNC, 0644);
 	processPid = fork();
 	if (processPid == 0) {
-		setEnv(Conf, _requestHandle);
-		dup2(pipeParentToChild[READ], STDIN_FILENO);
-		close(pipeParentToChild[WRITE]);
+		FD tempFileFdIn, tempFileFdOut; 
 		extern char **environ;
-		if (tempFileFd == -1) {
-			std::cerr << "failed to open | " << __LINE__ << std::endl;
+		
+		setEnv(Conf, _requestHandle);
+		tempFileFdIn = open(tempFileNameIn.c_str(), O_RDWR | O_CREAT | O_TRUNC, 0644);
+		tempFileFdOut = open(tempFileNameOut.c_str(), O_RDWR | O_CREAT | O_TRUNC, 0644);
+		if (tempFileFdIn == -1 || tempFileFdOut == -1) {
 			exit(InternalServerError_500);
 		}
-		dup2(tempFileFd, STDOUT_FILENO);
+		write(tempFileFdIn, _requestHandle.getBody().data(), _requestHandle.getBody().length());
+		close(tempFileFdIn);
+		tempFileFdIn = open(tempFileNameIn.c_str(), O_RDWR, 0644);
+		dup2(tempFileFdIn, STDIN_FILENO);
+		dup2(tempFileFdOut, STDOUT_FILENO);
 		if (execve(commands[0], commands.data(), environ) == -1) {
 			std::cerr << "failed to execve | " << __LINE__ << std::endl;
 			exit(InternalServerError_500);
 		}
 	} else if (processPid > 0) {
-		close(pipeParentToChild[READ]);
-		write(pipeParentToChild[WRITE], _requestHandle.getBody().data(), _requestHandle.getBody().length());
-		close(pipeParentToChild[WRITE]);
 		this->_procPtr = new procInfo();
 		_procPtr->pid = processPid;
-		_procPtr->tempFilePath = tempFilePath;
+		_procPtr->tempFileNameIn = tempFileNameIn;
+		_procPtr->tempFileNameOut = tempFileNameOut;
 		std::cout << "process parent action success" << std::endl;
 		return ;
 	} else {
-		close(pipeParentToChild[READ]);
-		close(pipeParentToChild[WRITE]);
 		std::cout << "failed to fork()" << std::endl;
 		throw InternalServerError_500;
 	}
@@ -182,7 +178,7 @@ void Client::generateResponse(const Config &Conf) {
 		_responseHandle.initPathFromLocation(_requestHandle, Conf);
 		if (_responseHandle.isCGI()) {
 			handleCGI(Conf);
-			return ;		
+			return ;
 		} else {
 			_response = _responseHandle.generateHTTPFullString(_requestHandle, Conf);
 		}
@@ -190,7 +186,6 @@ void Client::generateResponse(const Config &Conf) {
 		_response = Error::errorHandler(Conf[_port], num);
 	} catch (StatusCode num) {
 		_requestHandle.setReadStatus(READ_ERROR);
-		// _responseHandle.getLocation().setCgi(false);
 		_response = Error::errorHandler(Conf[_port], num);
 	}
 	catch (std::exception &e) {

@@ -22,7 +22,6 @@ public:
     Config(int argc, char **argv);
 
     ~Config();
-    // void setServers(const std::map<std::string, ServerConfig> servers);
 	void 		setServerName(std::string serverName);
     ServerConfig operator[](Port port) const;
     ServerConfig operator[](int i) const;
@@ -30,7 +29,9 @@ public:
 
     void    parseConfig(const std::string filename);
     int getNumberOfServer() const;
+    bool preConfigCheck(const std::string filename);
 };
 
 void replaceTabsWithSpaces(std::string& str);
+bool validateLocationConfig(const std::string &line);
 #endif

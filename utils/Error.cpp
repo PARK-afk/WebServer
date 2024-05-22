@@ -151,21 +151,12 @@ std::string Error::errorHandler(const ServerConfig &Serv, int num) {
 
 	fileName = "/" + Manager::utils.toString(num) + ".html";
 	testPath = Serv.getErrorPagesPath() + fileName; 
-	std::cout << testPath << std::endl;
 	std::ifstream file(testPath.c_str());
 	
 	if (file.is_open() && file.good()) {
-		// 파일 크기 확인
 		std::streamsize fileSize = Manager::responseUtils.getFileSize(file);
 
-		// 파일 크기 제한 설정
-		const std::streamsize maxFileSize = 10 * 1024 * 1024;
-		if (fileSize > maxFileSize) {
-			return createErrorResponse(PayloadTooLarge_413);
-		}
-		// 파일 내용 읽기
 		std::string body = Manager::responseUtils.readFileContent(file, fileSize);
-		// std::cout << body << std::endl;
 		file.close();
 
 		response.setStatusCode(NotFound_404);

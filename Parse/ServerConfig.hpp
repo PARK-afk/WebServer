@@ -35,9 +35,8 @@ public:
 	 
     Port getPortName() const;
     size_t getNumberOfLocation();
-
+	size_t getClientMaxBodySize() const ;
     
-    //용도에 맞게 바꿨으니 이거 지우지 마시오.
     LocationConfig getLocation(int i) {
         return _locations[i];
     }
@@ -60,7 +59,6 @@ public:
 			httpPath = httpPath.substr(0, httpPath.find('/'));
 		}
 	}
-	// LocationConfig에서 이걸 처리하는게 맞는지 모르겠음 보통이런건 request에서 처리하는게 맞는거 같은데
 
 	bool isConfPattern(const std::string& str) {
 		std::stringstream ss(str);
@@ -107,10 +105,8 @@ public:
 		
         if (isExtention(httpPath))
 		{
-		
 			extention = httpPath.substr(httpPath.find_last_of('.'), httpPath.size() - httpPath.find_last_of('.'));
 			extention = extention.substr(0, extention.find_first_of('/'));
-			// 정규식으로 만들기
 			extention = "\\" + extention + "$";
 			if (isConfPattern(extention)) {
 
@@ -120,15 +116,11 @@ public:
 						return _locations[i];
 					}
 				}
-			} else throw std::runtime_error("error at LocationFonfig::getLocation");
+			}
 		}
-        // std::cout << "extension string : " << extention << std::endl;
 		std::vector<std::string> tokens = getHttpUriToken(httpPath);
         for (size_t i = 0; i < _locations.size(); i++) {
-            // if (_locations[i].getPath().find('.') == std::string::npos) {
 				for (size_t j = 0; j < tokens.size(); j++) {
-					// std::cout << _locations[i].getPath() << std::endl;
-					// std::cout << tokens[j] << std::endl;
 					if (tokens[j] == _locations[i].getPath())
 					{
 						return _locations[i];

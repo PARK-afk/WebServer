@@ -22,7 +22,7 @@ LocationConfig::LocationConfig(std::ifstream &file, std::string &defaultIndex) :
         std::istringstream iss(line);
         std::string key;
         
-        if (!(iss >> key)) continue; // Skip empty lines
+        if (!(iss >> key)) continue;
         
         if (key == "}") {
             break ;
@@ -175,14 +175,12 @@ std::string                 LocationConfig::getAlias() const { return _alias; }
 std::string LocationConfig::getRoot() const {
     std::string root = _root;
     
-    // 경로 정규화
     std::replace(root.begin(), root.end(), '\\', '/');
     std::string::size_type pos = 0;
     while ((pos = root.find("//", pos)) != std::string::npos) {
         root.erase(pos, 1);
     }
     
-    // 마지막 슬래시 제거
     if (!root.empty() && root.back() == '/') {
         root.pop_back();
     }
@@ -218,26 +216,18 @@ std::string                 LocationConfig::getReturnUrl() const {
 }
 
 std::string                 LocationConfig::getFastcgiPass() const {
-    // if (_fastcgi_pass.empty())
-    //     return "";
     return _fastcgi_pass;
 }
 
 std::string                 LocationConfig::getUploadPass() const {
-    // if (_upload_pass.empty())
-    //     return "";
     return _upload_pass;
 }
 
 std::string                 LocationConfig::getUploadStore() const {
-    // if (_upload_store.empty())
-    //     return "";
     return _upload_store;
 }
 
 std::string                 LocationConfig::getUploadStateStore() const {
-    // if (_upload_state_store.empty())
-    //     return "";
     return _upload_state_store;
 }
 
@@ -246,14 +236,10 @@ bool                        LocationConfig::getUploadResume() const {
 }
 
 std::string                 LocationConfig::getUploadMaxFileSize() const {
-    // if (_upload_max_file_size.empty())
-    //     return "1m";
     return _upload_max_file_size;
 }
 
 std::string                 LocationConfig::getUploadLimitRate() const {
-    // if (_upload_limit_rate.empty())
-    //     return "0";
     return _upload_limit_rate;
 }
 

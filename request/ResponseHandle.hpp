@@ -1,6 +1,5 @@
 #pragma once
 
-// #include "Response.hpp"
 #include "RequestHandle.hpp"
 #include "../Parse/Config.hpp"
 #include "../utils/utils.hpp"
@@ -20,7 +19,6 @@ class Response;
 
 class ResponseHandle {
 	private:
-		// Response 		_response;
 		bool			_isInitFromLocation;
 		std::string 	_response;
 		std::string 	_filePath;
@@ -36,15 +34,13 @@ class ResponseHandle {
 		ResponseHandle(const ResponseHandle &Copy);
 		~ResponseHandle();
 		std::string	generateHTTPFullString(const RequestHandle &Req, const Config &Conf);
-		std::string	handleGetRequest(const RequestHandle &Req);
+		std::string	handleGetRequest(const RequestHandle &Req, const Config &Conf);
 		std::string handlePostRequest(const RequestHandle &Req);
 		Response	handleMethodNotAllowed();
-		std::string handleFormData(const std::string &cgiPath, const RequestHandle &Req);
 		std::string getFilePath(const std::string &serverRoot, const std::string &httpUri, LocationConfig &loc);
-		Response	createErrorResponse(int code, const std::string &message);
 		Response 	handleRedirect(const LocationConfig &location);
 		void		handleAutoIndex(Response &response, const std::string &servRoot);
-		std::string	handleDeleteRequest();
+		std::string	handleDeleteRequest(const Config &Conf);
 		void		setResponse(const std::string &response);
 		void		clearAll();
 		const std::string getResponse();
@@ -55,7 +51,7 @@ class ResponseHandle {
 		std::string	getHttpUri() const;
 		std::string	getServerRoot() const;
 		Port		getPort() const;
-		LocationConfig	getLocation() const;
+		const LocationConfig&	getLocation() const;
 		ResponseHandle& operator=(const ResponseHandle &Copy);
 };
 

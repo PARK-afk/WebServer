@@ -14,7 +14,7 @@ private:
 	int _status;
 	std::string _reason;
 	std::string _body;
-	std::string _location; // Redirect location
+	std::string _location;
 public:
     typedef std::multimap<std::string, std::string> Headers;
     Headers headers;
@@ -39,12 +39,9 @@ public:
 
     void removeHeader(const std::string& name);
 
-    // 헤더 가져오기
     std::string getHeaderValue(const std::string& name) const;
-    // 모든 헤더 값 가져오기
     std::vector<std::string> getHeaderValues(const std::string& name) const;
 
-    // 헤더 존재 여부 확인
     bool hasHeader(const std::string& name) const;
 
 	void setBody(const std::string& body);

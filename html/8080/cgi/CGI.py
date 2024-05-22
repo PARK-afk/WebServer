@@ -42,6 +42,10 @@ def handleGet():
 	elif path_info == "/listing":
 		listing = FileControl(form)
 		listing.display()
+	elif path_info == "/delete":
+		listing = FileControl(form)
+		listing.delete()
+		listing.display()
 	else:
 		html = HTMLForm("Bad Request METHOD")
 		responseForm(400, html, "text/html", len(html))

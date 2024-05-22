@@ -82,7 +82,6 @@ int RequestHandle::getResponseStatus() const {
 }
 
 void RequestHandle::setBuffer(unsigned char *buffer, int length) {
-    // _buffer.insert(_buffer.end(), buffer.begin(), buffer.end());
     for (int i = 0; i < length; i++) {
         _buffer += buffer[i];
     }
@@ -122,7 +121,6 @@ void RequestHandle::setRequest() {
 
     if (_readStatus == READ_DONE) {
         validateRequest();
-        std::cout << _buffer << std::endl;
         _responseStatus = 200;
     }
 }

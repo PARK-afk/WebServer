@@ -52,7 +52,7 @@ class Server
 		void queueInit(const Config &Conf);
 		void run(const Config &Conf);
 		void handleClientRead(FD clientFD, const Config &Conf);
-		void handleClientWrite(FD clientFD, const Config &Conf);
+		void handleClientWrite(FD clientFD);
 		void handleClientCgi(struct kevent &currEvent, const Config &conf);
 		void delayResponse(double seconds);
 };

@@ -10,7 +10,6 @@
 
 class LocationConfig {
     private:
-    // std::unordered_map<std::string, std::string> fastcgi_params;
     std::string                 _path;
     std::string                 _alias;
     std::string                 _root;
@@ -36,7 +35,6 @@ class LocationConfig {
     public:
     ~LocationConfig() {}
 	LocationConfig() : _cgi(false) {}
-    // setter
     LocationConfig(std::ifstream &file, std::string &_defaultIndex);
     
     // getter
@@ -60,7 +58,7 @@ class LocationConfig {
 	bool						isCgi() const;
 	void						setCgi(bool cgi);
     bool                        isEtag() const;
-    // // 추가적인 필요한 변수들
+
     std::string                 getAllowedMethod(size_t i) const;
     
 };

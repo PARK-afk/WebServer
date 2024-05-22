@@ -16,8 +16,9 @@
 
 typedef struct s_procInfo {
     pid_t pid;
-    int clientFd;
-	std::string tempFilePath;
+	FD clientFd;
+	std::string tempFileNameIn;
+	std::string tempFileNameOut;
 } procInfo;
 
 class Client {
@@ -44,19 +45,18 @@ class Client {
 		procInfo*	getProcInfo() const;
 		void		makeExecuteCommand(std::string &extention);
 		void		setEnv(const Config &Conf, const RequestHandle &Req);
-		void		makeTempFileNameForCgi(std::string &filePath);
+		void		makeTempFileNameForCgi(std::string &filePath, int mode);
 		void		handleCGI(const Config &Conf);
-
-		// ResponseHandle getResponseHandle() const;
 
 		const ResponseHandle& getResponseHandle() const;
 
 		Port		getPort() const;
-
-		// std::string setResponse();
 		std::string getResponse() const;
 		void		setResponse(const std::string &param);
 		void		appendResponse(const char *param);
 		void		cutResponse(int length);
+		bool		iscgi() const {
+			return _responseHandle.isCGI();
+		}
 };
 #endif

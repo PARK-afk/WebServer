@@ -10,7 +10,7 @@
 # include <sys/stat.h>
 # include <cstring>
 # include <iomanip>
-# include <dirent.h> // DIR을 위함.
+# include <dirent.h>
 # include "structRq.hpp"
 # include "../Manager/Manager.hpp"
 # include "../utils/utils.hpp"

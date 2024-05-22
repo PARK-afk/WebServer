@@ -15,22 +15,18 @@ bool    ResponseUtils::isMethodPossible(int method, const LocationConfig &Loc) {
 
 bool ResponseUtils::isValidPath(const std::string &path)
 {
-	// 경로가 비어있는 경우
 	if (path.empty())
 	{
 		return false;
 	}
-	// 경로가 너무 긴 경우
 	if (path.length() > PATH_MAX)
 	{
 		return false;
 	}
-	// 경로에 불법적인 문자가 포함된 경우
 	if (path.find_first_of("\0\\") != std::string::npos)
 	{
 		return false;
 	}
-	// 경로가 상대경로인 경우
 	if (path[0] != '/')
 	{
 		return false;
@@ -73,10 +69,8 @@ int ResponseUtils::getMethodNumber(const std::string &method) {
 std::string ResponseUtils::nomralizeUrl(const std::string &HTTP_uri) {
 	std::string normalizedUrl = HTTP_uri;
 	
-	// //제거
 	std::string::size_type pos = 0;
 	while ((pos = normalizedUrl.find("//", pos)) != std::string::npos) {
-		std::cout << "pos: " << pos << std::endl;
 		normalizedUrl.erase(pos, 1);
 	}
 	return normalizedUrl;
@@ -85,18 +79,11 @@ std::string ResponseUtils::nomralizeUrl(const std::string &HTTP_uri) {
 std::string ResponseUtils::normalizePath(const std::string &path) {
     std::string normalizedPath = path;
     
-    // 연속된 슬래시를 하나의 슬래시로 치환
     std::string::size_type pos = 0;
     while ((pos = normalizedPath.find("//", pos)) != std::string::npos) {
         normalizedPath.erase(pos, 1);
     }
     
-    // // 경로의 마지막 문자가 '/'인 경우 제거
-    // if (!normalizedPath.empty() && normalizedPath[normalizedPath.length() - 1] == '/') {
-    //     normalizedPath.erase(normalizedPath.length() - 1);
-    // }
-    
-    // 상대경로 요소 제거
     while ((pos = normalizedPath.find("/../")) != std::string::npos) {
         if (pos == 0) {
             return "";
@@ -108,12 +95,10 @@ std::string ResponseUtils::normalizePath(const std::string &path) {
         normalizedPath.erase(prevPos, pos - prevPos + 3);
     }
     
-    // 현재 디렉토리 요소 제거
     while ((pos = normalizedPath.find("/./")) != std::string::npos) {
         normalizedPath.erase(pos, 2);
     }
     
-	// std::cout << "normalizedPath: " << normalizedPath << std::endl;
     return normalizedPath;
 }
 
@@ -131,7 +116,7 @@ std::string ResponseUtils::generateETag(const std::string& content) {
         int c;
         for (size_t i = 0; i < content.length(); ++i) {
             c = content[i];
-            hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+            hash = ((hash << 5) + hash) + c;
         }
         std::ostringstream oss;
         oss << "\"" << hash << "\"";
@@ -157,7 +142,7 @@ bool ResponseUtils::isDirectory(const std::string &path)
 	{
 		if (S_ISREG(st.st_mode))
 		{
-			return false; // 파일인 경우 false 반환
+			return false;
 		}
 		return S_ISDIR(st.st_mode);
 	}
@@ -246,7 +231,6 @@ std::string ResponseUtils::getContentType(const std::string &extension)
 		return "text/html; charset=utf-8";
 	else if (extension == "css")
 		return "text/css";
-	// 다른 확장자에 대한 Content-Type 매핑 추가
 	else if (extension == "png")
 		return "image/png";
 	else if (extension == "jpg")

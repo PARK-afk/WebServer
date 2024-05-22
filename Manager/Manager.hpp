@@ -5,8 +5,6 @@
 #include "../request/NResponseUtils.hpp"
 #include "../utils/utils.hpp"
 #include "../request/Request.hpp"
-// class Utils;
-// class RequestUtils;
 
 class Manager {
 	public:

@@ -1,7 +1,5 @@
 #include "socket.hpp"
 
-/* Socket 기본설정 */
-
 void Socket::__init__(std::string host, Port port) {
     struct addrinfo hints;
     memset(&hints, 0, sizeof(hints));
@@ -44,8 +42,6 @@ void Socket::__init__(Port port) {
     }
 }
 
-// Socket 클래스 생성자
-
 Socket::Socket(std::string host, Port port) : _listenSocket(-1), _port(port), _host(host) {
     if (host.empty()) {
         std::cout << "Host is empty" << std::endl;
@@ -64,7 +60,6 @@ Socket::Socket(const Socket& other) : _port(other._port), _host(other._host), _a
     std::cout << "Socket copied" << std::endl;
 }
 
-/* Socket 생성 */
 FD Socket::socket(int domain, int type, int protocol) {
     std::cout << "Socket created" << std::endl;
     _listenSocket = ::socket(domain, type, protocol);
@@ -81,7 +76,6 @@ FD Socket::socket(int domain, int type, int protocol) {
     return _listenSocket;
 }
 
-/* Socket 바인딩 */
 Status Socket::bind() {
     if (::bind(_listenSocket, _addrInfo->ai_addr, _addrInfo->ai_addrlen) == FAILURE) {
         std::cerr << "Error: Failed to bind socket. Error code: " << errno << std::endl;
@@ -90,7 +84,6 @@ Status Socket::bind() {
     return SUCCESS;
 }
 
-/* Socket 리스닝 */
 Status Socket::listen(size_t backlog) {
     if (::listen(_listenSocket, backlog) == FAILURE) {
         std::cerr << "Error: Failed to listen socket. Error code: " << errno << std::endl;
@@ -105,11 +98,8 @@ FD Socket::accept(FD _listenSocket) {
     Client_Socket = ::accept(_listenSocket, NULL, NULL);
     if (Client_Socket == -1) {
         if (errno == EAGAIN || errno == EWOULDBLOCK) {
-            // 클라이언트 연결 요청이 없는 경우, 다른 작업을 수행하거나 잠시 대기할 수 있습니다.
             return Client_Socket;
-            // throw std::runtime_error("Error: Failed to accept socket");
         } else {
-            // 실제 에러 발생 시 예외 처리합니다.
             std::cerr << "Error: Failed to accept socket. Error code: " << errno << std::endl;
             throw std::runtime_error("Error: Failed to accept socket");
         }
@@ -118,7 +108,6 @@ FD Socket::accept(FD _listenSocket) {
     return Client_Socket;
 }
 
-/* Socket 닫기 */
 Status Socket::close() {
     if (_listenSocket == -1) {
         std::cout << "Socket already closed" << std::endl;
@@ -133,13 +122,7 @@ Status Socket::close() {
     return SUCCESS;
 }
 
-/* Socket 비동기 활성화 */
 Status Socket::nonblocking() {
-    // int flags = Socket::getSocketOPT(_listenSocket);
-    // if (flags == -1) {
-    //     std::cerr << "Error: Failed to get socket flags. Error code: " << errno << std::endl;
-    //     return FAILURE;
-    // }
     int flags = fcntl(_listenSocket, F_GETFL, 0);
 
     if (fcntl(_listenSocket, F_SETFL, flags | O_NONBLOCK) == -1) {
@@ -150,11 +133,6 @@ Status Socket::nonblocking() {
 }
 
 Status Socket::nonblocking(const FD &socket) {
-    // int flags = Socket::getSocketOPT(socket);
-    // if (flags == -1) {
-    //     std::cerr << "Error: Failed to get socket flags. Error code: " << errno << std::endl;
-    //     return FAILURE;
-    // }
     int flags = fcntl(socket, F_GETFL, 0);
 
     if (fcntl(socket, F_SETFL, flags | O_NONBLOCK) == -1) {
@@ -164,7 +142,6 @@ Status Socket::nonblocking(const FD &socket) {
     return SUCCESS;
 }
 
-/* Socket 옵션 설정 */
 void Socket::setSocketOption(int level, int option_name, int opt) {
     socklen_t optlen = sizeof(opt);
 
@@ -183,14 +160,11 @@ int setReceiveBufferSize(FD _fd, int size) {
 }
 
 void Socket::__init__SocketoptAuto(int opt) {
-    (void)opt;
     setSocketOption(SOL_SOCKET, SO_REUSEADDR, opt);
     setSocketOption(SOL_SOCKET, SO_KEEPALIVE, opt);
 	setReceiveBufferSize(_listenSocket, 1024);
-    // setSocketOption(SOL_SOCKET, SO_REUSEPORT, opt);
 }
 
-/* Socket 자동 활성화 */
 void Socket::autoActivate(int domain, int type, int protocol) {
     socket(domain, type, protocol);
     std::cout << "Socket activated" << std::endl;
@@ -206,12 +180,10 @@ void Socket::autoActivate(int domain, int type, int protocol) {
 	std::cout << "Host: " << _host << "Host IP: " << getSocketIP() << "Port: " << getPort() << "Protocol: " << getProtocolName() << std::endl;
 }
 
-/* Socket 복제 */
 Socket *Socket::clone() const {
     return new Socket(*this);
 }
 
-/* Socket 소멸자 */
 Socket::~Socket() {
     if (_listenSocket == -1) {
         std::cout << "Socket already closed" << std::endl;
@@ -229,7 +201,6 @@ Socket::~Socket() {
     }
 }
 
-/* Socket 할당 해제 */
 Socket& Socket::operator=(const Socket& other) {
     if (this != &other) {
         if (::close(_listenSocket) == -1) {
@@ -245,7 +216,6 @@ Socket& Socket::operator=(const Socket& other) {
     return *this;
 }
 
-/* 주소 정보 설정 */
 void Socket::setAddrInfo(struct addrinfo *addrInfo) {
     _addrInfo = addrInfo;
 }

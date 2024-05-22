@@ -9,21 +9,20 @@ Port ServerConfig::getPortName() const {return _port;}
 
 size_t ServerConfig::getNumberOfLocation() {return _locations.size();}
 
+size_t  ServerConfig::getClientMaxBodySize() const {return _client_max_body_size;}
+
 ServerConfig::ServerConfig(std::ifstream &file)
 {
     std::string     line;
-    // bool inServerBlock = false;
 
     while (getline(file, line)) {
         replaceTabsWithSpaces(line);
         std::istringstream iss(line);
         std::string key;
-        if (!(iss >> key)) continue; // Skip empty lines
+        if (!(iss >> key)) continue;
 
         if (line[0] ==  '}') break ;
         
-        // if (key == "server") {
-        //     inServerBlock = true;}
         if (key == "path") {
             iss >> this->_path;
         }
@@ -39,7 +38,6 @@ ServerConfig::ServerConfig(std::ifstream &file)
             std::string error_pages;
             iss >> error_pages;
             this->_error_pages_path = this->_path + error_pages;
-            std::cout << "error_pages_path: " << this->_error_pages_path << std::endl;
         } else if (key == "client_max_body_size") {
             std::string client_max_body_size;
             iss >> client_max_body_size;
@@ -58,7 +56,6 @@ std::unordered_map<int, std::string> ServerConfig::parseErrorPages(std::istrings
     std::string error_code;
     std::string error_page;
     while (true) {
-        // if (!(iss >> error_code >> error_page)) return errno;
         error_pages[std::atoi(error_code.c_str())] = error_page;
         if (iss.eof()) break;
     }
