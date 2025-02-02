@@ -201,7 +201,6 @@ void Server::handleClientCgi(struct kevent &currEvent, const Config & Conf) {
 			break;
 		ptr->appendResponse(buffer);
 	}
-
 	close(tempFileFd);
 	std::remove(procPtr->tempFileNameIn.c_str());
 	std::remove(procPtr->tempFileNameOut.c_str());

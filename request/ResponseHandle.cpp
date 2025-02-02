@@ -69,7 +69,7 @@ std::string ResponseHandle::handleDeleteRequest(const Config &Conf) {
 
 std::string ResponseHandle::generateHTTPFullString(const RequestHandle &Req, const Config &Conf)
 {
-		initPathFromLocation(Req, Conf);
+	initPathFromLocation(Req, Conf);
 	int method = Manager::responseUtils.getMethodNumber(Req.getMethod());
 	if (Manager::responseUtils.isMethodPossible(method, _loc) == false) {
 		throw MethodNotAllowed_405;
