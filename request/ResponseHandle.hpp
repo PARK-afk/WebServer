@@ -35,7 +35,7 @@ class ResponseHandle {
 		~ResponseHandle();
 		std::string	generateHTTPFullString(const RequestHandle &Req, const Config &Conf);
 		std::string	handleGetRequest(const RequestHandle &Req, const Config &Conf);
-		std::string handlePostRequest(const RequestHandle &Req);
+		std::string handlePostRequest(const RequestHandle &Req, const Config &Conf);
 		Response	handleMethodNotAllowed();
 		std::string getFilePath(const std::string &serverRoot, const std::string &httpUri, LocationConfig &loc);
 		Response 	handleRedirect(const LocationConfig &location);

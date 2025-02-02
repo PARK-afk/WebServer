@@ -9,7 +9,7 @@ import time
 
 tmp = os.environ.get("DOCUMENT_ROOT")
 UPLOAD_DIR = tmp + os.environ.get("UPLOAD_DIR")
-MAX_FILE_SIZE = 5 * 1024 * 1024
+MAX_FILE_SIZE = os.environ.get("MAX_LENGTH")
 ALLOWED_EXTENSIONS = [".jpg", ".jpeg", ".png", ".gif", ".pdf", ".txt", ".zip", ".tar.gz", ".tar.bz2", ".tar.xz", ".tar"]
 FILE_SIZE_ERROR = 1
 FILE_EXTENSION_ERROR = 2

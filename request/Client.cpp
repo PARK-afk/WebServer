@@ -79,7 +79,10 @@ void	Client::setEnv(const Config &Conf, const RequestHandle &Req) {
 	std::string serverName = host;
 	std::string cgiPath = _responseHandle.getFilePath();
 	std::string serverPort = Manager::utils.toString(_port);
+	std::string maxLength = Manager::utils.toString(Conf[_port].getClientMaxBodySize());
+	std::cout << "setEnv | maxLength = " << maxLength << std::endl;
     if (Req.getMethod() == "GET" || Req.getMethod() == "POST") {
+		setenv("MAX_LENGTH", maxLength.c_str(), 1);
         setenv("SERVER_SOFTWARE", "webserv", 1);
     	setenv("SERVER_NAME", serverName.c_str(), 1);
         setenv("SERVER_PROTOCOL", "HTTP/1.1", 1);

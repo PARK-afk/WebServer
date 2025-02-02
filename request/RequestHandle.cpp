@@ -119,6 +119,8 @@ void RequestHandle::setRequest() {
             parseRegularBody(body);
     }
 
+    if (_readStatus == READ_ERROR)
+        throw BadRequest_400;
     if (_readStatus == READ_DONE) {
         validateRequest();
         _responseStatus = 200;
@@ -293,8 +295,6 @@ void RequestHandle::validateRequest()
 		throw HttpVersionNotSupported_505;
 	if (_request._headers.find("Host") == _request._headers.end())
 		throw BadRequest_400;
-    if (_readStatus == READ_ERROR)
-        throw BadRequest_400;
 }
 
 void RequestHandle::printAllHeaders() const{
